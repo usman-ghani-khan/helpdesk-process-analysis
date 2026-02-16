@@ -2,7 +2,7 @@
 ## Bottleneck Analysis & Operational Optimization
 
 **Author:** Usman Ghani Khan  
-**Tools:** SQL (PostgreSQL), Python (Pandas, NumPy), Tableau, Advanced Excel  
+**Tools:** SQL (PostgreSQL), Tableau, Python  
 **Domain:** IT Operations, Process Improvement  
 
 ---
@@ -30,45 +30,88 @@ IT helpdesk operations face a critical challenge: **long ticket resolution times
 
 ## 📁 Dataset
 
-**Source:** [Mendeley Data - Helpdesk Dataset](https://data.mendeley.com/datasets/39bp3vv62t/1)  
-**Description:** Real ticketing management process from an Italian software company's help desk  
-**License:** MIT License  
-**Volume:** 3,804 process instances (tickets), 13,710 events  
+**Source:** Simulated IT helpdesk dataset based on the [Mendeley Helpdesk Dataset](https://data.mendeley.com/datasets/39bp3vv62t/1)  
+**Description:** Enhanced event log data modeling a typical IT service desk workflow  
+**Volume:** 500 tickets, 4,500 events  
 **Process Stages:** 9 activities from ticket creation to closure  
 
-**Why this dataset?**
-- Real-world business process data (not synthetic/tutorial data)
-- Contains timestamp-level granularity for accurate cycle time analysis
-- Demonstrates process mining and operational analytics skills
-- Publicly available and verifiable
+**Dataset Fields:**
+- Case_ID (ticket identifier)
+- Activity (process stage: Ticket Created, Initial Triage, Assigned to Agent, etc.)
+- Timestamp (event time)
+- Priority (Critical, High, Medium, Low)
+- Category (Hardware, Software, Network, Email, Access)
+- Agent (assigned support agent)
+
+**Why simulated enhancement?**
+The original Mendeley dataset contains only Case_ID, Activity, and Timestamp. To demonstrate comprehensive BI analysis capabilities, this project uses a simulated enhancement that adds:
+- **Priority levels** (for SLA and urgency analysis)
+- **Category types** (for ticket segmentation)
+- **Agent assignments** (for workload analysis)
+
+This enhancement allows demonstration of realistic business scenarios including priority-based segmentation, category performance analysis, and resource allocation optimization—skills directly applicable to real BI work.
 
 ---
 
 ## 🔍 Methodology
 
-### 1. Data Preparation
-- Loaded event log data into PostgreSQL database
-- Wrote SQL queries to calculate time deltas between consecutive process stages
-- Cleaned data: handled null timestamps, standardized activity names
+### 1. Database Setup & Data Loading
+- Created PostgreSQL database schema for event log structure
+- Loaded helpdesk ticket data (500 tickets, 4,500 events)
+- Validated data quality: timestamps, case IDs, activity names
 
-### 2. Bottleneck Identification
-- Calculated average, median, and standard deviation of cycle times for each stage
-- Flagged stages with >20 hour average wait time as bottlenecks
-- Categorized severity: CRITICAL (>40h), HIGH (20-40h), MODERATE (<20h)
+### 2. SQL-Based Analysis (Primary Tool)
 
-### 3. Segmentation Analysis
-- Grouped tickets by **Priority** (Critical, High, Medium, Low)
-- Grouped tickets by **Category** (Hardware, Software, Network, Email, Access)
-- Analyzed how priority and category affect resolution time
+**All core analysis performed using PostgreSQL queries with advanced SQL techniques:**
 
-### 4. Business Impact Calculation
-- Identified top 2 bottlenecks consuming 73% of total resolution time
-- Calculated potential savings from 30% reduction in bottleneck time
-- Estimated FTE equivalency and annual cost savings
+**Cycle Time Calculation (Query 1)**
+```sql
+-- Used LEAD() window function to calculate time between events
+LEAD(timestamp) OVER (PARTITION BY case_id ORDER BY timestamp)
+-- Extracted hours using EPOCH conversion
+EXTRACT(EPOCH FROM (end_time - start_time)) / 3600
+```
 
-### 5. Recommendation Engine
-- Generated data-driven recommendations based on bottleneck patterns
-- Prioritized actions by expected impact and implementation feasibility
+**Bottleneck Identification (Query 2)**
+```sql
+-- Flagged severity levels using CASE statements
+CASE 
+    WHEN AVG(duration_hours) > 40 THEN 'CRITICAL'
+    WHEN AVG(duration_hours) > 20 THEN 'HIGH'
+    ELSE 'MODERATE'
+END AS severity_level
+```
+
+**Priority Segmentation (Query 3)**
+- Grouped bottleneck stages by priority level
+- Compared wait times: Critical vs High vs Medium vs Low
+- Identified whether SLAs are being met
+
+**Category Analysis (Query 4)**
+- Calculated end-to-end resolution time using MIN/MAX timestamps
+- Cross-tabulated category × priority for comprehensive view
+- Used PERCENTILE_CONT for median calculations
+
+**Agent Performance (Query 5)**
+- Analyzed workload distribution across support team
+- Calculated handling time efficiency per agent
+- Filtered for agents with ≥10 tickets (significant volume)
+
+**Business Impact Modeling (Query 7)**
+- Calculated total bottleneck hours per ticket
+- Modeled 30% reduction scenario
+- Computed FTE equivalency: (annual_hours_saved / 2080)
+- Estimated cost savings at $30/hour loaded cost
+
+### 3. Data Export
+- Used Python (Pandas + SQLAlchemy) solely for exporting SQL results to CSV
+- Exported 2 files: `stage_summary.csv`, `resolution_summary.csv`
+
+### 4. Tableau Dashboard
+- Imported CSV files into Tableau
+- Created 3-panel dashboard with bottleneck ranking, category distribution, priority impact
+- Added executive summary with key metrics
+
 
 ---
 
@@ -128,22 +171,35 @@ All categories show similar resolution times, suggesting bottlenecks are **proce
 ## 🛠️ Technical Implementation
 
 ### SQL Queries (`/sql/analysis_queries.sql`)
-- Cycle time calculation using window functions (LEAD, LAG)
-- Bottleneck identification with aggregations and CASE statements
-- Agent performance analysis
-- Customer interaction tracking
 
-### Python Analysis (`/analysis/bottleneck_analysis.py`)
-- Event log processing with Pandas
-- Statistical aggregations (mean, median, percentiles)
-- Business impact calculations
-- Automated recommendation generation
+**7 comprehensive queries covering all analysis:**
+
+1. **Cycle Time Calculation** - LEAD() window functions, PARTITION BY case_id
+2. **Bottleneck Identification** - Aggregations, CASE severity flags, HAVING filters
+3. **Priority Segmentation** - GROUP BY priority, focused on top 2 bottlenecks
+4. **Category Analysis** - MIN/MAX timestamps, cross-tabulation
+5. **Agent Performance** - Workload distribution, efficiency metrics
+6. **Customer Interaction Impact** - Isolation of customer-dependent delays
+7. **Business Impact Modeling** - FTE calculation, cost savings projection
+
+**Advanced SQL techniques demonstrated:**
+- Window functions (LEAD, LAG, PARTITION BY)
+- Common Table Expressions (WITH clauses)
+- Statistical functions (PERCENTILE_CONT, STDDEV)
+- CASE statements for conditional logic
+- HAVING clauses for aggregate filtering
+- EPOCH time extraction and conversion
+
+### Python Script (`/analysis/export_results.py`)
+
+- **Purpose:** Export SQL query results to CSV for Tableau
+- **Tools:** Pandas (CSV I/O), SQLAlchemy (database connection)
 
 ### Tableau Dashboard (`/dashboards/`)
-- **Panel 1:** Average cycle time by process stage (bar chart with severity coloring)
-- **Panel 2:** Resolution time distribution by category (box plot)
+- **Panel 1:** Average cycle time by process stage (horizontal bar chart, severity colors)
+- **Panel 2:** Resolution time distribution by category (box-and-whisker plot)
 - **Panel 3:** Average resolution time by priority (grouped bar chart)
-- **Panel 4:** Key metrics summary and recommended actions
+- **Text Box:** Key findings and business impact metrics
 
 ---
 
@@ -151,52 +207,52 @@ All categories show similar resolution times, suggesting bottlenecks are **proce
 
 ```
 helpdesk-process-analysis/
-├── README.md                       # This file
+├── README.md                      # This file
 ├── data/
-│   └── dataset_source.md           # Link to Mendeley dataset
+│   ├── dataset_source.md          # Link to Mendeley dataset
+│   └── helpdesk_process_log.csv   # Simulated helpdesk dataset
 ├── sql/
-│   └── analysis_queries.sql        # PostgreSQL queries for data extraction
+│   └── analysis_queries.sql       # PostgreSQL queries (ALL analysis logic)
 ├── analysis/
-│   └── bottleneck_analysis.py      # Python script for statistical analysis
+│   └── export_results.py          # Minimal Python script for CSV export
 ├── dashboards/
-│   └── helpdesk_dashboard.png      # Tableau dashboard screenshot
+│   └── helpdesk_dashboard.png     # Tableau dashboard screenshot
 └── results/
-    ├── stage_summary.csv           # Aggregated cycle time statistics
-    ├── resolution_summary.csv      # Resolution time by category/priority
-    └── recommendations.csv         # Generated improvement recommendations
+    ├── stage_summary.csv          # SQL query output: cycle time statistics
+    ├── resolution_summary.csv     # SQL query output: resolution times
+    └── recommendations.csv        # SQL query output: improvement actions
 ```
 
 ---
 
 ## 🎓 Skills Demonstrated
 
-✅ **Process Mining:** Event log analysis, cycle time calculation, bottleneck identification  
-✅ **SQL:** Window functions, aggregations, complex joins, time-based queries  
-✅ **Python:** Pandas for data manipulation, statistical analysis, automation  
-✅ **Data Visualization:** Tableau dashboard design, effective visual storytelling  
-✅ **Business Analysis:** Translating data insights into actionable recommendations  
-✅ **Cost-Benefit Analysis:** Quantifying ROI and business impact  
+✅ **SQL (PostgreSQL):** Window functions (LEAD, PARTITION BY), CTEs, aggregations, CASE statements, statistical functions (PERCENTILE_CONT, STDDEV), time-based calculations  
+✅ **Process Mining:** Event log analysis, cycle time calculation, bottleneck identification, workflow optimization  
+✅ **Data Visualization:** Tableau dashboard design, effective visual storytelling, executive reporting  
+✅ **Business Analysis:** Translating data insights into actionable recommendations, stakeholder communication  
+✅ **Cost-Benefit Analysis:** ROI calculation, FTE equivalency modeling, business case development  
+✅ **Python:** Basic Pandas for data export, SQLAlchemy for database connectivity  
 
 ---
 
 ## 🚀 How to Reproduce
-
-1. **Download dataset** from [Mendeley repository](https://data.mendeley.com/datasets/39bp3vv62t/1)
+1. **Use dataset** from `/data/helpdesk_process_log.csv`
 2. **Load into PostgreSQL:**
    ```sql
    CREATE TABLE helpdesk_events (
-       case_id VARCHAR(50),
-       activity VARCHAR(100),
-       timestamp TIMESTAMP,
-       priority VARCHAR(20),
-       category VARCHAR(50),
-       agent VARCHAR(50)
+       Case_ID VARCHAR(50),
+       Activity VARCHAR(100),
+       Timestamp TIMESTAMP,
+       Priority VARCHAR(20),
+       Category VARCHAR(50),
+       Agent VARCHAR(50)
    );
    ```
 3. **Run SQL queries** from `/sql/analysis_queries.sql`
-4. **Execute Python analysis:**
+4. **Execute Python export file:**
    ```bash
-   python analysis/bottleneck_analysis.py
+   python analysis/export_results.py
    ```
 5. **Import results CSVs into Tableau** to recreate dashboard
 
@@ -204,7 +260,7 @@ helpdesk-process-analysis/
 
 ## 📞 Contact
 
-**Usman Ghani Khan**
+**Usman Ghani Khan**    
 💼 [LinkedIn](https://linkedin.com/in/usman-ghani-k)  
 🔗 [GitHub](https://github.com/usman-ghani-khan)
 
