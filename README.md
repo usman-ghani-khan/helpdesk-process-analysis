@@ -159,12 +159,32 @@ All categories show similar resolution times, suggesting bottlenecks are **proce
 | 3 | **Dedicated resources** for critical/high priority tickets (<4 hour SLA) | Priority Handling | 40% improvement in critical ticket resolution |
 | 4 | **Searchable knowledge base** with solution templates | Investigation | 15-20% reduction in investigation time |
 
-### Estimated Business Value
+### Business Value (Scenario Analysis)
 
-- **Time saved per ticket:** 26.4 hours (30% of 87.9-hour bottleneck time)
-- **Annual hours saved:** 13,194 hours (based on 500 tickets/year)
-- **FTE equivalency:** 6.3 full-time employees
-- **Annual cost savings:** $395,820 (assuming $30/hour loaded cost)
+**Data-Driven Findings:**
+- Top 2 bottlenecks: 87.9 hours combined (73% of total resolution time)
+- 500 tickets analyzed
+- Average resolution time: ~110 hours per ticket
+
+**Projected Impact (If 30% Bottleneck Reduction Achieved):**
+
+**Key Assumptions:**
+1. Process improvements reduce bottleneck time by 30% (from 87.9 to 61.5 hours)
+2. Annual ticket volume: 500 tickets/year
+3. Loaded labor cost: $30/hour (IT support staff average)
+4. Interventions maintain quality without adding other delays
+
+**Scenario Calculations:**
+- Time saved per ticket: 26.4 hours (30% of 87.9 hours)
+- Annual hours saved: 13,194 hours (26.4 × 500 tickets)
+- **FTE equivalency:** 6.3 full-time employees (13,194 ÷ 2,080 work hours/year)
+- **Estimated cost avoidance:** ~$395,820 annually (13,194 × $30/hour)
+
+*Note: These are scenario-based projections to illustrate potential value. Actual results depend on:*
+- *Implementation quality of automation tools*
+- *User adoption of self-service options*
+- *Sustained process discipline*
+- *No assumption that reduced cycle time compromises solution quality*
 
 ---
 
