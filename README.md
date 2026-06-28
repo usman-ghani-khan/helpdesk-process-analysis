@@ -2,14 +2,14 @@
 ## Bottleneck Analysis & Operational Optimization
 
 **Author:** Usman Ghani Khan  
-**Tools:** SQL (PostgreSQL), Tableau, Python  
+**Tools:** SQL (PostgreSQL), Power BI, Python  
 **Domain:** IT Operations, Process Improvement  
 
 ---
 
 ## 📊 Business Problem
 
-IT helpdesk operations face a critical challenge: **long ticket resolution times** that impact customer satisfaction and operational costs. Without clear visibility into process bottlenecks, teams struggle to identify where delays occur and how to optimize workflows.
+IT helpdesk operations face a critical challenge: **long ticket resolution times** that impact customer satisfaction and operational costs. Without clear visibility into process bottlenecks, teams cannot prioritize improvements effectively.
 
 **Key Questions:**
 - Which process stages consume the most time?
@@ -49,7 +49,7 @@ The original Mendeley dataset contains only Case_ID, Activity, and Timestamp. To
 - **Category types** (for ticket segmentation)
 - **Agent assignments** (for workload analysis)
 
-This enhancement allows demonstration of realistic business scenarios including priority-based segmentation, category performance analysis, and resource allocation optimization—skills directly applicable to real BI work.
+This enhancement allows demonstration of realistic business scenarios including priority-based segmentation, category performance analysis, and resource allocation optimization—skills directly applicable to enterprise IT environments.
 
 ---
 
@@ -107,11 +107,15 @@ END AS severity_level
 - Used Python (Pandas + SQLAlchemy) solely for exporting SQL results to CSV
 - Exported 2 files: `stage_summary.csv`, `resolution_summary.csv`
 
-### 4. Tableau Dashboard
-- Imported CSV files into Tableau
-- Created 3-panel dashboard with bottleneck ranking, category distribution, priority impact
-- Added executive summary with key metrics
-
+### 4. Power BI Dashboard
+- Imported CSV files into Power BI
+- Created interactive multi-page dashboard with:
+  - **Page 1 - Executive Summary:** Key KPIs, top bottlenecks, trend analysis
+  - **Page 2 - Bottleneck Analysis:** Detailed cycle time by process stage with severity indicators
+  - **Page 3 - Category & Priority Performance:** Cross-tabulation analysis and distribution charts
+  - **Page 4 - Agent Performance:** Workload distribution and efficiency metrics
+- Added drill-down capabilities and dynamic filtering for deeper exploration
+- Implemented business impact visualizations showing projected cost savings scenarios
 
 ---
 
@@ -212,14 +216,16 @@ All categories show similar resolution times, suggesting bottlenecks are **proce
 
 ### Python Script (`/analysis/export_results.py`)
 
-- **Purpose:** Export SQL query results to CSV for Tableau
+- **Purpose:** Export SQL query results to CSV for Power BI
 - **Tools:** Pandas (CSV I/O), SQLAlchemy (database connection)
 
-### Tableau Dashboard (`/dashboards/`)
-- **Panel 1:** Average cycle time by process stage (horizontal bar chart, severity colors)
-- **Panel 2:** Resolution time distribution by category (box-and-whisker plot)
-- **Panel 3:** Average resolution time by priority (grouped bar chart)
-- **Text Box:** Key findings and business impact metrics
+### Power BI Dashboard (`/dashboards/`)
+- **Multi-page interactive dashboard** with drill-down capabilities
+- **Page 1 - Executive Summary:** KPI cards, top metrics, trend sparklines
+- **Page 2 - Bottleneck Analysis:** Horizontal bar charts with severity color coding, detailed statistics
+- **Page 3 - Category & Priority Analysis:** Stacked bar charts, heat maps for cross-tabulation
+- **Page 4 - Agent Performance:** Workload distribution, efficiency metrics, performance rankings
+- **Dynamic Filtering:** Slicers for priority, category, and date range for interactive exploration
 
 ---
 
@@ -234,9 +240,14 @@ helpdesk-process-analysis/
 ├── sql/
 │   └── analysis_queries.sql       # PostgreSQL queries (ALL analysis logic)
 ├── analysis/
-│   └── export_results.py          # Minimal Python script for CSV export
+│   └── export_results.py          # Python script for CSV export
 ├── dashboards/
-│   └── helpdesk_dashboard.png     # Tableau dashboard screenshot
+│   ├── helpdesk_dashboard.pbix    # Power BI dashboard file
+│   └── dashboard_screenshots/     # PNG exports of Power BI pages
+│       ├── page1_executive_summary.png
+│       ├── page2_bottleneck_analysis.png
+│       ├── page3_category_priority.png
+│       └── page4_agent_performance.png
 └── results/
     ├── stage_summary.csv          # SQL query output: cycle time statistics
     ├── resolution_summary.csv     # SQL query output: resolution times
@@ -249,7 +260,7 @@ helpdesk-process-analysis/
 
 ✅ **SQL (PostgreSQL):** Window functions (LEAD, PARTITION BY), CTEs, aggregations, CASE statements, statistical functions (PERCENTILE_CONT, STDDEV), time-based calculations  
 ✅ **Process Mining:** Event log analysis, cycle time calculation, bottleneck identification, workflow optimization  
-✅ **Data Visualization:** Tableau dashboard design, effective visual storytelling, executive reporting  
+✅ **Data Visualization:** Power BI dashboard design, interactive reporting, multi-page layouts, effective visual storytelling  
 ✅ **Business Analysis:** Translating data insights into actionable recommendations, stakeholder communication  
 ✅ **Cost-Benefit Analysis:** ROI calculation, FTE equivalency modeling, business case development  
 ✅ **Python:** Basic Pandas for data export, SQLAlchemy for database connectivity  
@@ -257,6 +268,7 @@ helpdesk-process-analysis/
 ---
 
 ## 🚀 How to Reproduce
+
 1. **Use dataset** from `/data/helpdesk_process_log.csv`
 2. **Load into PostgreSQL:**
    ```sql
@@ -274,7 +286,11 @@ helpdesk-process-analysis/
    ```bash
    python analysis/export_results.py
    ```
-5. **Import results CSVs into Tableau** to recreate dashboard
+5. **Import results CSVs into Power BI** to recreate dashboard:
+   - Open Power BI Desktop
+   - Connect to CSV files from `/results/` directory
+   - Build visualizations using the Power BI dashboard structure provided
+   - Or open `helpdesk_dashboard.pbix` for the complete pre-built dashboard
 
 ---
 
